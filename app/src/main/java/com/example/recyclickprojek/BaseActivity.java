@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.example.recyclickprojek.Fragment.DataBarangFragment;
 import com.example.recyclickprojek.Fragment.HomeFragment;
 import com.example.recyclickprojek.Fragment.LoginFragment;
 import com.example.recyclickprojek.Util.Util;
@@ -19,7 +20,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-        Util.pindahFragment(getSupportFragmentManager(), new LoginFragment());
+        Util.pindahFragment(getSupportFragmentManager(), new DataBarangFragment());
         hideActionBar();
 
     }

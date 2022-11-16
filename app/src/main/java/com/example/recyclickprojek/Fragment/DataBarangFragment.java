@@ -2,13 +2,30 @@ package com.example.recyclickprojek.Fragment;
 
 import android.os.Bundle;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.recyclickprojek.API.APIRequestData;
+import com.example.recyclickprojek.API.serverRetrofit;
+import com.example.recyclickprojek.Adapter.AdapterBarang;
+import com.example.recyclickprojek.Model.ModelDataBarang;
+import com.example.recyclickprojek.Model.responsDataBarang;
 import com.example.recyclickprojek.R;
+import com.example.recyclickprojek.databinding.FragmentDataBarangBinding;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +42,11 @@ public class DataBarangFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private RecyclerView rcycview;
+    private RecyclerView.Adapter rvadapter;
+    private RecyclerView.LayoutManager lmdata;
+    private List<ModelDataBarang> listdata = new ArrayList<>();
 
     public DataBarangFragment() {
         // Required empty public constructor
@@ -60,7 +82,36 @@ public class DataBarangFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        FragmentDataBarangBinding br = DataBindingUtil.inflate(inflater, R.layout.fragment_data_barang, container,false);
+        rcycview = br.rcyBarang;
+        lmdata = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
+        rcycview.setLayoutManager(lmdata);
+        retriveData();
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_data_barang, container, false);
+    }
+
+    public void retriveData() {
+        APIRequestData ard = serverRetrofit.koneksiRetrofit().create(APIRequestData.class);
+        Call<responsDataBarang> tampilkanData = ard.ardRetriveBarang();
+
+        tampilkanData.enqueue(new Callback<responsDataBarang>() {
+            @Override
+            public void onResponse(Call<responsDataBarang> call, Response<responsDataBarang> response) {
+                int kode = response.body().getKode();
+                String message = response.body().getMessage();
+                listdata = response.body().getData();
+                rvadapter = new AdapterBarang(getContext(), listdata);
+                rcycview.setAdapter(rvadapter);
+                rvadapter.notifyDataSetChanged();
+
+                Toast.makeText(getActivity(), "Kode "+kode +"| pesan "+message, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<responsDataBarang> call, Throwable t) {
+                Toast.makeText(getActivity(), "terdapat kesalah : "+t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
